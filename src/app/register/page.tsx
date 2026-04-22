@@ -1,120 +1,62 @@
-import React, { useState } from 'react';
-import { 
-  Chrome, 
-  Apple, 
-  Slack, 
-  Mail, 
-  ArrowRight, 
-  Component 
-} from 'lucide-react';
+import React from 'react';
 
-interface SocialButtonProps {
-  icon: React.ReactNode;
-  label: string;
-  onClick?: () => void;
-}
-
-const RegisterPage: React.FC = () => {
-  const [email, setEmail] = useState<string>('');
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Registering with:", email);
-  };
-
+const RegisterPage = () => {
   return (
-    <div className="min-h-screen bg-[#FAFBFC] flex flex-col items-center justify-center font-sans text-[#172B4D] p-4">
-      {/* Brand Logo Section */}
-      <div className="mb-8 flex items-center gap-3 group cursor-default">
-        <div className="bg-[#0052CC] p-2 rounded-lg transition-transform group-hover:rotate-12">
-          <Component className="text-white w-6 h-6" />
-        </div>
-        <h1 className="text-2xl font-black tracking-tighter text-[#0052CC]">
-          NEXUS
-        </h1>
-      </div>
-
-      {/* Auth Card */}
-      <div className="w-full max-w-[400px] bg-white border border-[#DFE1E6] rounded-md px-8 py-10 transition-all">
-        <header className="text-center mb-8">
-          <h2 className="text-[#172B4D] text-xl font-bold mb-2">Create your account</h2>
-          <p className="text-[#5E6C84] text-sm">Join thousands of developers today.</p>
-        </header>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="relative group">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A5ADBA] group-focus-within:text-[#0052CC] transition-colors" />
-            <input
-              required
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter work email"
-              className="w-full pl-10 pr-4 py-2.5 bg-[#F4F5F7] border-2 border-transparent rounded-md outline-none focus:bg-white focus:border-[#4C9AFF] transition-all placeholder:text-[#A5ADBA] text-sm"
-            />
+    <div className="relative min-h-screen bg-gray-50 p-8">
+      {/* Background Skeleton */}
+      <div className="grid grid-cols-4 gap-6 opacity-30 pointer-events-none select-none">
+        {[...Array(8)].map((_, i) => (
+          <div key={i} className="border border-gray-300 rounded-lg p-4 h-48 bg-white">
+            <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
+            <div className="h-3 bg-gray-200 rounded w-full mb-2"></div>
+            <div className="h-3 bg-gray-200 rounded w-5/6"></div>
           </div>
-          
-          <button 
-            type="submit"
-            className="w-full bg-[#0052CC] hover:bg-[#0747A6] active:scale-[0.98] text-white font-semibold py-2.5 rounded-md transition-all flex items-center justify-center gap-2"
-          >
-            Continue
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        </form>
-
-        {/* Divider */}
-        <div className="my-8 flex items-center">
-          <div className="flex-grow border-t border-[#DFE1E6]"></div>
-          <span className="px-3 text-[10px] text-[#8993A4] font-bold uppercase tracking-widest">OR</span>
-          <div className="flex-grow border-t border-[#DFE1E6]"></div>
-        </div>
-
-        {/* Social Authentication */}
-        <div className="space-y-3">
-          <SocialButton 
-            icon={<Chrome className="w-4 h-4 text-[#EA4335]" />} 
-            label="Continue with Google" 
-          />
-          <SocialButton 
-            icon={<Apple className="w-4 h-4 fill-current" />} 
-            label="Continue with Apple" 
-          />
-          <SocialButton 
-            icon={<Slack className="w-4 h-4 text-[#4A154B]" />} 
-            label="Continue with Slack" 
-          />
-        </div>
-
-        <footer className="mt-8 pt-6 border-t border-[#DFE1E6] text-center">
-          <p className="text-sm text-[#5E6C84]">
-            Already have an account?{' '}
-            <a href="#" className="text-[#0052CC] font-medium hover:underline">Log in</a>
-          </p>
-        </footer>
+        ))}
       </div>
 
-      {/* Legal Footer */}
-      <div className="mt-8 flex items-center gap-4 text-[11px] text-[#5E6C84] font-medium">
-        <a href="#" className="hover:text-[#0052CC] transition-colors">Privacy Policy</a>
-        <div className="w-1 h-1 bg-[#DFE1E6] rounded-full"></div>
-        <a href="#" className="hover:text-[#0052CC] transition-colors">Terms of Service</a>
+      {/* Centered Form Modal */}
+      <div className="absolute inset-0 flex items-center justify-center p-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-8 w-full max-w-md shadow-none">
+          <h2 className="text-2xl font-semibold text-gray-900 text-center mb-2">
+            Get started with Jira
+          </h2>
+          <p className="text-sm text-gray-600 text-center mb-6">
+            It's free for up to 10 users - no credit card needed.
+          </p>
+
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Work email
+          </label>
+          <div className="flex gap-2 mb-6">
+            <input
+              type="email"
+              placeholder="you@company.com"
+              className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+            />
+            <button className="bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-blue-700">
+              Sign up
+            </button>
+          </div>
+
+          <div className="relative mb-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="bg-white px-2 text-gray-500">Or continue with</span>
+            </div>
+          </div>
+
+          <button className="w-full flex items-center justify-center gap-2 border border-gray-300 rounded py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+            <span className="font-bold text-lg">G</span> Google
+          </button>
+
+          <p className="text-center text-xs text-gray-500 mt-6">
+            Already have Jira? <a href="#" className="text-blue-600 hover:underline">Log in</a>
+          </p>
+        </div>
       </div>
     </div>
-  );
-};
-
-// Reusable Social Button Component
-const SocialButton: React.FC<SocialButtonProps> = ({ icon, label, onClick }) => {
-  return (
-    <button 
-      onClick={onClick}
-      type="button"
-      className="w-full flex items-center justify-center gap-3 border border-[#DFE1E6] bg-white hover:bg-[#F4F5F7] active:bg-[#EBECF0] py-2.5 rounded-md font-semibold text-[#42526E] text-sm transition-all"
-    >
-      {icon}
-      {label}
-    </button>
   );
 };
 
