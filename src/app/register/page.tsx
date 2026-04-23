@@ -39,7 +39,12 @@ const RegisterPage = () => {
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const toggleCheckbox = (field: "work" | "team", value: string) => {
@@ -57,9 +62,9 @@ const RegisterPage = () => {
 
   const handleSubmit = async () => {
     try {
-      console.log(form);
+      console.log("SUBMIT:", form);
 
-      const res = await axios.post("/api/auth/register", form);
+      const res = await axios.post("/api/users", form);
 
       console.log(res.data);
     } catch (error) {
@@ -68,78 +73,116 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
-      <div className="bg-white border border-gray-200 rounded-xl p-6 w-full max-w-xl">
-        <h1 className="text-xl font-semibold mb-4 text-center">
-          Create Account
-        </h1>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-6">
 
-        {/* BASIC FIELDS */}
-        <input
-          name="fullName"
-          placeholder="Full Name"
-          className="w-full border p-2 mb-3 rounded"
-          onChange={handleChange}
-        />
+      <div className="w-full max-w-2xl bg-white shadow-xl rounded-2xl overflow-hidden">
 
-        <input
-          name="email"
-          placeholder="Email"
-          className="w-full border p-2 mb-3 rounded"
-          onChange={handleChange}
-        />
-
-        <input
-          name="password"
-          type="password"
-          placeholder="Password"
-          className="w-full border p-2 mb-3 rounded"
-          onChange={handleChange}
-        />
-
-        <input
-          name="site"
-          placeholder="Website (optional)"
-          className="w-full border p-2 mb-5 rounded"
-          onChange={handleChange}
-        />
-
-        {/* WORK */}
-        <h2 className="font-medium mb-2">Work</h2>
-        <div className="grid grid-cols-2 gap-2 mb-5">
-          {WORK_OPTIONS.map((w) => (
-            <label key={w} className="text-sm flex gap-2">
-              <input
-                type="checkbox"
-                checked={form.work.includes(w)}
-                onChange={() => toggleCheckbox("work", w)}
-              />
-              {w}
-            </label>
-          ))}
+        {/* HEADER */}
+        <div className="p-6 border-b">
+          <h1 className="text-2xl font-bold text-gray-800">
+            Create your account
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Build your workspace profile in minutes
+          </p>
         </div>
 
-        {/* TEAM */}
-        <h2 className="font-medium mb-2">Team Style</h2>
-        <div className="grid grid-cols-1 gap-2 mb-6">
-          {TEAM_OPTIONS.map((t) => (
-            <label key={t} className="text-sm flex gap-2">
-              <input
-                type="checkbox"
-                checked={form.team.includes(t)}
-                onChange={() => toggleCheckbox("team", t)}
-              />
-              {t}
-            </label>
-          ))}
-        </div>
+        {/* FORM */}
+        <div className="p-6 space-y-4">
 
-        <button
-          onClick={handleSubmit}
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-        >
-          Create Account
-        </button>
+          {/* BASIC INFO */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <input
+              name="fullName"
+              value={form.fullName}
+              onChange={handleChange}
+              placeholder="Full Name"
+              className="border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+
+            <input
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              placeholder="Email"
+              className="border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+
+            <input
+              name="password"
+              type="password"
+              value={form.password}
+              onChange={handleChange}
+              placeholder="Password"
+              className="border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+
+            <input
+              name="site"
+              value={form.site}
+              onChange={handleChange}
+              placeholder="Website (optional)"
+              className="border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          {/* WORK SECTION */}
+          <div>
+            <h2 className="font-semibold text-gray-700 mt-4 mb-2">
+              What do you do?
+            </h2>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+              {WORK_OPTIONS.map((w) => (
+                <button
+                  type="button"
+                  key={w}
+                  onClick={() => toggleCheckbox("work", w)}
+                  className={`text-xs p-2 rounded-lg border transition ${
+                    form.work.includes(w)
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : "bg-white hover:bg-gray-100"
+                  }`}
+                >
+                  {w}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* TEAM SECTION */}
+          <div>
+            <h2 className="font-semibold text-gray-700 mt-4 mb-2">
+              How do you work?
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {TEAM_OPTIONS.map((t) => (
+                <button
+                  type="button"
+                  key={t}
+                  onClick={() => toggleCheckbox("team", t)}
+                  className={`text-xs p-2 rounded-lg border transition text-left ${
+                    form.team.includes(t)
+                      ? "bg-gray-900 text-white border-gray-900"
+                      : "bg-white hover:bg-gray-100"
+                  }`}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* SUBMIT */}
+          <button
+            onClick={handleSubmit}
+            className="w-full mt-6 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition"
+          >
+            Create Account
+          </button>
+
+        </div>
       </div>
     </div>
   );
