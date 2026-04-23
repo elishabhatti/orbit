@@ -1,60 +1,145 @@
-import React from 'react';
+"use client";
+
+import axios from "axios";
+import React, { useState } from "react";
+
+const WORK_OPTIONS = [
+  "software development",
+  "marketing",
+  "project management",
+  "it support",
+  "customer service",
+  "finance",
+  "data science",
+  "design",
+  "operations",
+  "human resources",
+  "legal",
+  "sales",
+  "other",
+];
+
+const TEAM_OPTIONS = [
+  "track work",
+  "manage tasks",
+  "works in scrum",
+  "run sprints",
+  "prioritize work",
+  "map work dependencies",
+];
 
 const RegisterPage = () => {
+  const [form, setForm] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    site: "",
+    work: [] as string[],
+    team: [] as string[],
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const toggleCheckbox = (field: "work" | "team", value: string) => {
+    setForm((prev) => {
+      const exists = prev[field].includes(value);
+
+      return {
+        ...prev,
+        [field]: exists
+          ? prev[field].filter((v) => v !== value)
+          : [...prev[field], value],
+      };
+    });
+  };
+
+  const handleSubmit = async () => {
+    try {
+      console.log(form);
+
+      const res = await axios.post("/api/auth/register", form);
+
+      console.log(res.data);
+    } catch (error) {
+      console.error("Registration failed:", error);
+    }
+  };
+
   return (
-    <div className="relative min-h-screen bg-gray-50 p-8">
-      {/* Background Skeleton */}
-      <div className="grid grid-cols-4 gap-6 opacity-30 pointer-events-none select-none">
-        {[...Array(8)].map((_, i) => (
-          <div key={i} className="border border-gray-300 rounded-lg p-4 h-48 bg-white">
-            <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
-            <div className="h-3 bg-gray-200 rounded w-full mb-2"></div>
-            <div className="h-3 bg-gray-200 rounded w-5/6"></div>
-          </div>
-        ))}
-      </div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
+      <div className="bg-white border border-gray-200 rounded-xl p-6 w-full max-w-xl">
+        <h1 className="text-xl font-semibold mb-4 text-center">
+          Create Account
+        </h1>
 
-      {/* Centered Form Modal */}
-      <div className="absolute inset-0 flex items-center justify-center p-4">
-        <div className="bg-white border border-gray-200 rounded-xl p-8 w-full max-w-md shadow-none">
-          <h2 className="text-2xl font-semibold text-gray-900 text-center mb-2">
-            Get started with Jira
-          </h2>
-          <p className="text-sm text-gray-600 text-center mb-6">
-            It's free for up to 10 users - no credit card needed.
-          </p>
+        {/* BASIC FIELDS */}
+        <input
+          name="fullName"
+          placeholder="Full Name"
+          className="w-full border p-2 mb-3 rounded"
+          onChange={handleChange}
+        />
 
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Work email
-          </label>
-          <div className="flex gap-2 mb-6">
-            <input
-              type="email"
-              placeholder="you@company.com"
-              className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
-            />
-            <button className="bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-blue-700">
-              Sign up
-            </button>
-          </div>
+        <input
+          name="email"
+          placeholder="Email"
+          className="w-full border p-2 mb-3 rounded"
+          onChange={handleChange}
+        />
 
-          <div className="relative mb-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="bg-white px-2 text-gray-500">Or continue with</span>
-            </div>
-          </div>
+        <input
+          name="password"
+          type="password"
+          placeholder="Password"
+          className="w-full border p-2 mb-3 rounded"
+          onChange={handleChange}
+        />
 
-          <button className="w-full flex items-center justify-center gap-2 border border-gray-300 rounded py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-            <span className="font-bold text-lg">G</span> Google
-          </button>
+        <input
+          name="site"
+          placeholder="Website (optional)"
+          className="w-full border p-2 mb-5 rounded"
+          onChange={handleChange}
+        />
 
-          <p className="text-center text-xs text-gray-500 mt-6">
-            Already have Jira? <a href="#" className="text-blue-600 hover:underline">Log in</a>
-          </p>
+        {/* WORK */}
+        <h2 className="font-medium mb-2">Work</h2>
+        <div className="grid grid-cols-2 gap-2 mb-5">
+          {WORK_OPTIONS.map((w) => (
+            <label key={w} className="text-sm flex gap-2">
+              <input
+                type="checkbox"
+                checked={form.work.includes(w)}
+                onChange={() => toggleCheckbox("work", w)}
+              />
+              {w}
+            </label>
+          ))}
         </div>
+
+        {/* TEAM */}
+        <h2 className="font-medium mb-2">Team Style</h2>
+        <div className="grid grid-cols-1 gap-2 mb-6">
+          {TEAM_OPTIONS.map((t) => (
+            <label key={t} className="text-sm flex gap-2">
+              <input
+                type="checkbox"
+                checked={form.team.includes(t)}
+                onChange={() => toggleCheckbox("team", t)}
+              />
+              {t}
+            </label>
+          ))}
+        </div>
+
+        <button
+          onClick={handleSubmit}
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+        >
+          Create Account
+        </button>
       </div>
     </div>
   );
