@@ -1,6 +1,7 @@
 import { connectDB } from "@/src/lib/db";
 import { userModel } from "@/src/models/user.model";
 import jwt from "jsonwebtoken";
+import { hash } from "argon2";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -10,10 +11,12 @@ export async function POST(req: Request) {
     const { fullName, email, password, site, work, team } =
       await req.json();
 
+    const hashedPassword = hash(password);
+
     const newUser = await userModel.create({
       fullName,
       email,
-      password,
+      password: hashedPassword,
       site,
       work,
       team,
