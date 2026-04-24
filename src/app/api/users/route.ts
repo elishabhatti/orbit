@@ -1,5 +1,6 @@
 import { connectDB } from "@/src/lib/db";
 import { userModel } from "@/src/models/user.model";
+import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -18,13 +19,29 @@ export async function POST(req: Request) {
       team,
     });
 
-    return NextResponse.json(newUser, { status: 201 });
+    const token = jwt.sign(
+      { userId: newUser._id },
+      process.env.JWT_SECRET!,
+      { expiresIn: "7d" }
+    );
 
-  } catch (error) {
-    console.error("Error from the user post function", error);
+    const response = NextResponse.json(
+      { message: "User created" },
+      { status: 201 }
+    );
 
+    response.cookies.set("token", token, {
+      httpOnly: true,
+      secure: true, // ⚠️ in dev you can make it false if needed
+      sameSite: "strict",
+      path: "/",
+    });
+
+    return response;
+
+  } catch (error: any) {
     return NextResponse.json(
-      { message: "Internal Server Error" },
+      { message: "Error", error: error.message },
       { status: 500 }
     );
   }
