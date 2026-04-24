@@ -92,7 +92,7 @@ export default function OrbitRegister() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#f7f8fa] overflow-hidden">
+    <div className="relative min-h-screen overflow-hidden">
       {/* SOFT GRID BACKGROUND (CLEAN JIRA FEEL) */}
       <div className="absolute inset-0 bg-[radial-gradient(#dfe1e6_1px,transparent_1px)] [background-size:20px_20px] opacity-40" />
 
