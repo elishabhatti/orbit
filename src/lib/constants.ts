@@ -1,4 +1,4 @@
-const WORK_OPTIONS = [
+export const WORK_OPTIONS = [
   { label: "software development", icon: "💻" },
   { label: "marketing", icon: "📢" },
   { label: "project management", icon: "📅" },
@@ -14,7 +14,7 @@ const WORK_OPTIONS = [
   { label: "other", icon: "✨" },
 ];
 
-const TEAM_OPTIONS = [
+export const TEAM_OPTIONS = [
   "track work",
   "manage tasks",
   "works in scrum",

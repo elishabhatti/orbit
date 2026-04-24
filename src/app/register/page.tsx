@@ -2,279 +2,177 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Eye, Check, Search, Bell, HelpCircle } from "lucide-react";
+import { Eye, Check, Search, Bell } from "lucide-react";
 import axios from "axios";
 
+const steps = ["Email", "Account", "Workspace", "Work", "Team"];
 
+type FormType = {
+  fullName: string;
+  email: string;
+  password: string;
+  siteName: string;
+  workType: string;
+  teamGoals: string[];
+};
 
-const RegisterPage = () => {
-  const [step, setStep] = useState(1);
-  const [form, setForm] = useState({
+export default function OrbitRegister() {
+  const [step, setStep] = useState<number>(1);
+  const [form, setForm] = useState<FormType>({
     fullName: "",
     email: "",
     password: "",
-    siteName: "elishacode2007",
+    siteName: "orbit-workspace",
     workType: "",
-    teamGoals: [] as string[],
+    teamGoals: [],
   });
 
-  const nextStep = () => setStep((prev) => prev + 1);
-  const prevStep = () => setStep((prev) => prev - 1);
+  const next = () => setStep((s) => Math.min(s + 1, 5));
+  const prev = () => setStep((s) => Math.max(s - 1, 1));
 
-  const handleUpdate = (fields: Partial<typeof form>) => {
-    setForm((prev) => ({ ...prev, ...fields }));
-  };
+  const update = (data: Partial<FormType>) =>
+    setForm((f) => ({ ...f, ...data }));
 
   const toggleGoal = (goal: string) => {
     const exists = form.teamGoals.includes(goal);
-    handleUpdate({
+    update({
       teamGoals: exists
         ? form.teamGoals.filter((g) => g !== goal)
         : [...form.teamGoals, goal],
     });
   };
 
-  const handleSubmit = async () => {
-    try {
-      const payload = {
-        fullName: form.fullName?.trim(),
-        email: form.email?.trim(),
-        password: form.password,
-        site: form.siteName?.trim(),
-        work: form.workType ? [form.workType] : [],
-        team: form.teamGoals.filter(Boolean),
-      };
-
-      const res = await axios.post("/api/users", payload);
-      alert("Success! Check your database.");
-    } catch (error: any) {
-      console.error("Error details:", error.response?.data);
-    }
+  const submit = async () => {
+    await axios.post("/api/users", {
+      ...form,
+      work: form.workType ? [form.workType] : [],
+    });
   };
 
-  const slideVariants = {
-    initial: { opacity: 0, x: 20 },
-    animate: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: -20 },
+  const variants = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -10 },
   };
 
   return (
-    <div className="relative min-h-screen w-full bg-[#f4f5f7] font-sans overflow-hidden">
-      {/* JIRA PROFESSIONAL SKELETON BACKGROUND */}
-      <div className="absolute inset-0 opacity-15 pointer-events-none">
-        {/* Top Nav */}
-        <div className="h-12 border-b border-gray-300 flex items-center px-4 justify-between">
-          <div className="flex gap-4 items-center">
+    <div className="relative min-h-screen bg-[#f4f5f7] overflow-hidden">
+
+      {/* FULL JIRA STYLE SKELETON BACKGROUND */}
+      <div className="absolute inset-0 opacity-40 pointer-events-none">
+
+        {/* Top Bar */}
+        <div className="h-12 bg-white border-b flex items-center justify-between px-4">
+          <div className="flex items-center gap-4">
             <div className="w-6 h-6 bg-blue-600 rounded-sm" />
-            <div className="w-20 h-3 bg-gray-300 rounded" />
+            <div className="w-24 h-3 bg-gray-300 rounded" />
             <div className="w-16 h-3 bg-gray-200 rounded" />
           </div>
-          <div className="flex gap-3 items-center">
+          <div className="flex items-center gap-3">
             <Search size={16} className="text-gray-400" />
             <Bell size={16} className="text-gray-400" />
             <div className="w-6 h-6 bg-gray-300 rounded-full" />
           </div>
         </div>
+
         <div className="flex h-[calc(100vh-48px)]">
+
           {/* Sidebar */}
-          <div className="w-60 border-r border-gray-300 p-4 space-y-4">
-            <div className="w-full h-8 bg-gray-200 rounded-md" />
-            <div className="space-y-2 pt-4">
-              {[...Array(8)].map((_, i) => (
-                <div key={i} className="h-3 bg-gray-200 rounded w-full" />
-              ))}
-            </div>
+          <div className="w-64 bg-white border-r p-4 space-y-4">
+            <div className="h-8 bg-gray-200 rounded" />
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="h-3 bg-gray-200 rounded" />
+            ))}
           </div>
-          {/* Board Content */}
-          <div className="flex-1 p-8 grid grid-cols-4 gap-6">
+
+          {/* Board */}
+          <div className="flex-1 p-6 grid grid-cols-4 gap-6">
             {[...Array(4)].map((_, i) => (
               <div key={i} className="space-y-4">
                 <div className="w-24 h-4 bg-gray-300 rounded" />
-                <div className="h-40 bg-white border border-gray-200 rounded p-3" />
-                <div className="h-32 bg-white border border-gray-200 rounded p-3" />
+                <div className="h-40 bg-white border rounded" />
+                <div className="h-32 bg-white border rounded" />
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* MODAL CONTAINER */}
-      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
-        <div
-          className={`w-full ${step >= 4 ? "max-w-[720px]" : "max-w-[520px]"} bg-white rounded-[3px] border border-[#dfe1e6] p-10 transition-all duration-500`}
-        >
+      {/* FORM MODAL */}
+      <div className="relative z-10 flex items-center justify-center min-h-screen px-4">
+        <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg p-8 border">
+
+          {/* Progress */}
+          <div className="flex items-center justify-between mb-6">
+            {steps.map((_, i) => (
+              <div key={i} className="flex-1 flex items-center gap-2">
+                <div
+                  className={`w-8 h-8 flex items-center justify-center rounded-full text-sm font-semibold ${step >= i + 1 ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-500"}`}
+                >
+                  {i + 1}
+                </div>
+                {i < steps.length - 1 && (
+                  <div className="flex-1 h-[2px] bg-gray-200" />
+                )}
+              </div>
+            ))}
+          </div>
+
+          <p className="text-sm text-gray-500 mb-6">Step {step} of 5</p>
+
           <AnimatePresence mode="wait">
             <motion.div
               key={step}
-              variants={slideVariants}
+              variants={variants}
               initial="initial"
               animate="animate"
               exit="exit"
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.25 }}
             >
+
               {step === 1 && (
-                <div className="text-center">
-                  <h1 className="text-[24px] font-semibold text-[#172b4d] mb-2 relative inline-block">
-                    Get started with Jira
-                    <svg
-                      className="absolute -bottom-1 left-0 w-full h-2"
-                      viewBox="0 0 100 10"
-                      preserveAspectRatio="none"
-                    >
-                      <path
-                        d="M0 5 Q 50 0 100 5"
-                        stroke="#ff8b00"
-                        strokeWidth="2"
-                        fill="transparent"
-                      />
-                    </svg>
-                  </h1>
-                  <p className="text-[#6b778c] text-[14px] mb-8">
-                    It's free for up to 10 users.
-                  </p>
-                  <div className="text-left space-y-4">
-                    <label className="text-[12px] font-bold text-[#6b778c] uppercase block">
-                      Work email
-                    </label>
-                    <div className="flex gap-2">
-                      <input
-                        type="email"
-                        value={form.email}
-                        onChange={(e) =>
-                          handleUpdate({ email: e.target.value })
-                        }
-                        placeholder="you@company.com"
-                        className="flex-1 border-2 border-[#dfe1e6] rounded-[3px] px-3 py-2 outline-none focus:border-[#4c9aff]"
-                      />
-                      <button
-                        onClick={nextStep}
-                        className="bg-[#0052cc] text-white px-6 py-2 rounded-[3px] font-medium hover:bg-[#0747a6]"
-                      >
-                        Sign up
-                      </button>
-                    </div>
-                  </div>
+                <div className="space-y-6">
+                  <h1 className="text-2xl font-semibold">Start your journey</h1>
+                  <input className="input" placeholder="Email" onChange={(e)=>update({email:e.target.value})} />
+                  <button onClick={next} className="btn-primary w-full">Continue</button>
                 </div>
               )}
 
               {step === 2 && (
-                <div className="text-center">
-                  <h1 className="text-[24px] font-semibold text-[#172b4d] mb-1 relative inline-block">
-                    Add your account details
-                    <svg
-                      className="absolute -bottom-1 left-0 w-full h-2"
-                      viewBox="0 0 100 10"
-                      preserveAspectRatio="none"
-                    >
-                      <path
-                        d="M0 5 Q 50 0 100 5"
-                        stroke="#ff8b00"
-                        strokeWidth="2"
-                        fill="transparent"
-                      />
-                    </svg>
-                  </h1>
-                  <p className="text-[#6b778c] text-[13px] mb-6">
-                    Signing up as{" "}
-                    <span className="text-blue-600 font-medium">
-                      {form.email}
-                    </span>
-                  </p>
-                  <div className="space-y-5 text-left">
-                    <div>
-                      <label className="text-[12px] font-bold text-[#6b778c] uppercase mb-1 block">
-                        Full name
-                      </label>
-                      <input
-                        value={form.fullName}
-                        onChange={(e) =>
-                          handleUpdate({ fullName: e.target.value })
-                        }
-                        className="w-full border-2 border-[#dfe1e6] rounded-[20px] px-4 py-2 outline-none focus:border-[#4c9aff]"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[12px] font-bold text-[#6b778c] uppercase mb-1 block">
-                        Password
-                      </label>
-                      <div className="relative">
-                        <input
-                          type="password"
-                          onChange={(e) =>
-                            handleUpdate({ password: e.target.value })
-                          }
-                          className="w-full border-2 border-[#dfe1e6] rounded-[20px] px-4 py-2 outline-none focus:border-[#4c9aff]"
-                        />
-                        <Eye className="absolute right-4 top-2.5 text-gray-400 w-5 h-5" />
-                      </div>
-                    </div>
-                    <button
-                      onClick={nextStep}
-                      className="w-full bg-[#0052cc] text-white py-3 rounded-[20px] font-bold hover:bg-[#0747a6]"
-                    >
-                      Continue
-                    </button>
+                <div className="space-y-6">
+                  <h1 className="text-2xl font-semibold">Create account</h1>
+                  <input className="input" placeholder="Full name" onChange={(e)=>update({fullName:e.target.value})} />
+                  <div className="relative">
+                    <input type="password" className="input" placeholder="Password" onChange={(e)=>update({password:e.target.value})} />
+                    <Eye className="absolute right-4 top-3 text-gray-400" />
+                  </div>
+                  <div className="flex gap-3">
+                    <button onClick={prev} className="btn-secondary">Back</button>
+                    <button onClick={next} className="btn-primary">Next</button>
                   </div>
                 </div>
               )}
 
               {step === 3 && (
-                <div className="text-center">
-                  <h1 className="text-[24px] font-semibold text-[#172b4d] mb-1">
-                    Create a site
-                  </h1>
-                  <p className="text-[#6b778c] text-[13px] mb-8">
-                    Where your team organizes work and projects.
-                  </p>
-                  <div className="text-left mb-8">
-                    <label className="text-[12px] font-bold text-[#6b778c] uppercase mb-1 block">
-                      Your site
-                    </label>
-                    <div className="flex border-2 border-[#dfe1e6] rounded-[3px] overflow-hidden focus-within:border-[#4c9aff]">
-                      <input
-                        className="flex-1 px-3 py-2 outline-none text-[#172b4d]"
-                        value={form.siteName}
-                        onChange={(e) =>
-                          handleUpdate({ siteName: e.target.value })
-                        }
-                      />
-                      <span className="bg-[#f4f5f7] px-3 py-2 text-[#6b778c] border-l border-[#dfe1e6] text-sm flex items-center">
-                        .atlassian.net{" "}
-                        <Check className="ml-2 w-4 h-4 text-green-600" />
-                      </span>
+                <div className="space-y-6">
+                  <h1 className="text-2xl font-semibold">Workspace</h1>
+                  <div className="flex">
+                    <input value={form.siteName} onChange={(e)=>update({siteName:e.target.value})} className="flex-1 input rounded-r-none" />
+                    <div className="bg-gray-100 px-4 flex items-center rounded-r-xl text-sm text-gray-500 border border-l-0">
+                      .orbit.app <Check className="ml-2 text-green-500" />
                     </div>
                   </div>
-                  <button
-                    onClick={nextStep}
-                    className="w-full bg-[#0052cc] text-white py-3 rounded-[3px] font-bold hover:bg-[#0747a6]"
-                  >
-                    Continue
-                  </button>
+                  <button onClick={next} className="btn-primary w-full">Continue</button>
                 </div>
               )}
 
               {step === 4 && (
-                <div>
-                  <h1 className="text-[24px] font-semibold text-[#172b4d] text-center mb-1">
-                    What kind of work do you do?
-                  </h1>
-                  <p className="text-[#6b778c] text-[13px] text-center mb-8">
-                    This helps us suggest professional templates.
-                  </p>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-8">
-                    {WORK_OPTIONS.map((opt) => (
-                      <button
-                        key={opt.label}
-                        onClick={() => {
-                          handleUpdate({ workType: opt.label });
-                          nextStep();
-                        }}
-                        className={`flex flex-col items-center gap-2 border p-4 rounded-[3px] transition-all text-center ${form.workType === opt.label ? "border-[#0052cc] bg-blue-50" : "border-[#dfe1e6] hover:bg-[#f4f5f7]"}`}
-                      >
-                        <span className="text-2xl">{opt.icon}</span>
-                        <span className="text-[#42526e] text-[12px] font-semibold">
-                          {opt.label}
-                        </span>
+                <div className="space-y-6">
+                  <h1 className="text-2xl font-semibold">Your work</h1>
+                  <div className="grid grid-cols-2 gap-3">
+                    {WORK_OPTIONS.map(w=> (
+                      <button key={w} onClick={()=>{update({workType:w});next();}} className="p-4 border rounded-xl hover:bg-gray-50">
+                        {w}
                       </button>
                     ))}
                   </div>
@@ -282,50 +180,53 @@ const RegisterPage = () => {
               )}
 
               {step === 5 && (
-                <div>
-                  <h1 className="text-[24px] font-semibold text-[#172b4d] text-center mb-8">
-                    How does your team plan to use Jira?
-                  </h1>
-                  <div className="grid grid-cols-2 gap-4 mb-8">
-                    {TEAM_OPTIONS.map((opt) => (
-                      <label
-                        key={opt}
-                        className={`flex items-center gap-3 border p-4 rounded-[3px] cursor-pointer transition-all ${form.teamGoals.includes(opt) ? "border-[#0052cc] bg-blue-50" : "border-[#dfe1e6] hover:border-blue-500"}`}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={form.teamGoals.includes(opt)}
-                          onChange={() => toggleGoal(opt)}
-                          className="w-4 h-4 rounded border-gray-300 text-blue-600"
-                        />
-                        <span className="text-[#42526e] text-sm font-medium">
-                          {opt}
-                        </span>
+                <div className="space-y-6">
+                  <h1 className="text-2xl font-semibold">Team goals</h1>
+                  <div className="grid grid-cols-2 gap-3">
+                    {["tasks","scrum","planning","tracking"].map(g=> (
+                      <label key={g} className="flex gap-2 p-3 border rounded-xl cursor-pointer hover:bg-gray-50">
+                        <input type="checkbox" onChange={()=>toggleGoal(g)} />
+                        {g}
                       </label>
                     ))}
                   </div>
-                  <div className="flex justify-center gap-4">
-                    <button
-                      onClick={prevStep}
-                      className="text-[#42526e] font-medium px-4 py-2 hover:bg-gray-100 rounded"
-                    >
-                      Back
-                    </button>
-                    <button
-                      onClick={handleSubmit}
-                      className="bg-[#0052cc] text-white px-8 py-2 rounded-[3px] font-medium hover:bg-[#0747a6]"
-                    >
-                      Finish Setup
-                    </button>
+                  <div className="flex gap-3">
+                    <button onClick={prev} className="btn-secondary">Back</button>
+                    <button onClick={submit} className="btn-primary">Finish</button>
                   </div>
                 </div>
               )}
+
             </motion.div>
           </AnimatePresence>
         </div>
       </div>
+
+      <style jsx>{`
+        .input {
+          width: 100%;
+          background: white;
+          border: 1px solid #e5e7eb;
+          padding: 12px 16px;
+          border-radius: 12px;
+          outline: none;
+        }
+        .input:focus {
+          border-color: #2563eb;
+          box-shadow: 0 0 0 2px rgba(37,99,235,0.1);
+        }
+        .btn-primary {
+          background: #2563eb;
+          color: white;
+          padding: 10px 16px;
+          border-radius: 12px;
+        }
+        .btn-secondary {
+          background: #f3f4f6;
+          padding: 10px 16px;
+          border-radius: 12px;
+        }
+      `}</style>
     </div>
   );
-};
-
-export default RegisterPage;
+}
