@@ -8,10 +8,17 @@ export async function POST(req: Request) {
   try {
     await connectDB();
 
-    const { fullName, email, password, site, work, team } =
-      await req.json();
+    const { fullName, email, password, site, work, team } = await req.json();
 
-    const hashedPassword = hash(password);
+    const existing = await userModel.findOne({ email });
+    if (existing) {
+      return NextResponse.json(
+        { message: "User already exists" },
+        { status: 409 },
+      );
+    }
+
+    const hashedPassword = await hash(password);
 
     const newUser = await userModel.create({
       fullName,
@@ -22,30 +29,27 @@ export async function POST(req: Request) {
       team,
     });
 
-    const token = jwt.sign(
-      { userId: newUser._id },
-      process.env.JWT_SECRET!,
-      { expiresIn: "7d" }
-    );
+    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET!, {
+      expiresIn: "7d",
+    });
 
     const response = NextResponse.json(
       { message: "User created" },
-      { status: 201 }
+      { status: 201 },
     );
 
     response.cookies.set("token", token, {
       httpOnly: true,
-      secure: true, // ⚠️ in dev you can make it false if needed
+      secure: true,
       sameSite: "strict",
       path: "/",
     });
 
     return response;
-
   } catch (error: any) {
     return NextResponse.json(
       { message: "Error", error: error.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

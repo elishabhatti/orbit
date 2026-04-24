@@ -52,7 +52,7 @@ export default function OrbitRegister() {
     workType: "",
     teamGoals: [],
   });
-  
+
   const router = useRouter();
   const next = () => setStep((s) => Math.min(s + 1, 5));
   const prev = () => setStep((s) => Math.max(s - 1, 1));
@@ -92,62 +92,50 @@ export default function OrbitRegister() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#f4f5f7] overflow-hidden">
-      {/* JIRA STYLE BACKGROUND */}
-      <div className="absolute inset-0 opacity-40 pointer-events-none">
-        <div className="h-12 bg-white border-b flex items-center justify-between px-4">
-          <div className="flex items-center gap-4">
-            <div className="w-6 h-6 bg-blue-600 rounded-sm" />
-            <div className="w-24 h-3 bg-gray-300 rounded" />
-            <div className="w-16 h-3 bg-gray-200 rounded" />
-          </div>
-          <div className="flex items-center gap-3">
-            <Search size={16} className="text-gray-400" />
-            <Bell size={16} className="text-gray-400" />
-            <div className="w-6 h-6 bg-gray-300 rounded-full" />
-          </div>
+    <div className="relative min-h-screen bg-[#f7f8fa] overflow-hidden">
+      {/* SOFT GRID BACKGROUND (CLEAN JIRA FEEL) */}
+      <div className="absolute inset-0 bg-[radial-gradient(#dfe1e6_1px,transparent_1px)] [background-size:20px_20px] opacity-40" />
+
+      {/* TOP BAR */}
+      <div className="absolute top-0 left-0 right-0 h-12 bg-white border-b flex items-center justify-between px-5 z-0">
+        <div className="flex items-center gap-4">
+          <div className="w-7 h-7 bg-blue-600 rounded-md shadow-sm" />
+          <div className="w-28 h-3 bg-gray-200 rounded" />
         </div>
 
-        <div className="flex h-[calc(100vh-48px)]">
-          <div className="w-64 bg-white border-r p-4 space-y-4">
-            <div className="h-8 bg-gray-200 rounded" />
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="h-3 bg-gray-200 rounded" />
-            ))}
-          </div>
-
-          <div className="flex-1 p-6 grid grid-cols-4 gap-6">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="space-y-4">
-                <div className="w-24 h-4 bg-gray-300 rounded" />
-                <div className="h-40 bg-white border rounded" />
-                <div className="h-32 bg-white border rounded" />
-              </div>
-            ))}
-          </div>
+        <div className="flex items-center gap-3">
+          <Search size={16} className="text-gray-400" />
+          <Bell size={16} className="text-gray-400" />
+          <div className="w-7 h-7 bg-gray-200 rounded-full" />
         </div>
       </div>
 
       {/* FORM */}
-      <div className="relative z-10 flex items-center justify-center min-h-screen px-4 backdrop-blur-sm">
-        <div className="w-full max-w-2xl bg-white rounded-2xl shadow-md p-8 border border-gray-200">
-          {/* Progress */}
-          <div className="flex items-center justify-between mb-6">
+      <div className="relative z-10 flex items-center justify-center min-h-screen px-4 pt-16">
+        <div className="w-full max-w-2xl bg-white/95 backdrop-blur-md border border-gray-200 shadow-xl rounded-2xl p-8">
+          {/* PROGRESS */}
+          <div className="flex mb-6">
             {steps.map((_, i) => (
-              <div key={i} className="flex-1 flex items-center gap-2">
+              <div key={i} className="flex-1 flex items-center">
                 <div
-                  className={`w-8 h-8 flex items-center justify-center rounded-full text-sm font-semibold ${step >= i + 1 ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-500"}`}
+                  className={`w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium transition ${
+                    step >= i + 1
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-200 text-gray-500"
+                  }`}
                 >
                   {i + 1}
                 </div>
-                {i < steps.length - 1 && (
-                  <div className="flex-1 h-0.5 bg-gray-200" />
+                {i !== steps.length - 1 && (
+                  <div className="flex-1 h-[2px] bg-gray-200 mx-2" />
                 )}
               </div>
             ))}
           </div>
 
-          <p className="text-sm text-gray-500 mb-6">Step {step} of 5</p>
+          <p className="text-xs text-gray-500 mb-6">
+            Step {step} of {steps.length}
+          </p>
 
           <AnimatePresence mode="wait">
             <motion.div
@@ -156,34 +144,47 @@ export default function OrbitRegister() {
               initial="initial"
               animate="animate"
               exit="exit"
-              transition={{ duration: 0.25 }}
+              transition={{ duration: 0.22 }}
             >
+              {/* STEP 1 */}
               {step === 1 && (
-                <div className="space-y-6">
-                  <h1 className="text-2xl font-semibold text-gray-800">
+                <div className="space-y-5">
+                  <h1 className="text-2xl font-semibold text-gray-900">
                     Start your journey
                   </h1>
+
                   <input
                     className="input"
                     placeholder="Email"
                     onChange={(e) => update({ email: e.target.value })}
                   />
+
                   <button onClick={next} className="btn-primary w-full">
                     Continue
+                  </button>
+
+                  <button
+                    onClick={() => router.push("/login")}
+                    className="text-sm text-blue-600 hover:underline w-full text-center"
+                  >
+                    Already have an account? Login
                   </button>
                 </div>
               )}
 
+              {/* STEP 2 */}
               {step === 2 && (
-                <div className="space-y-6">
-                  <h1 className="text-2xl font-semibold text-gray-800">
+                <div className="space-y-5">
+                  <h1 className="text-2xl font-semibold text-gray-900">
                     Create account
                   </h1>
+
                   <input
                     className="input"
                     placeholder="Full name"
                     onChange={(e) => update({ fullName: e.target.value })}
                   />
+
                   <div className="relative">
                     <input
                       type="password"
@@ -191,46 +192,49 @@ export default function OrbitRegister() {
                       placeholder="Password"
                       onChange={(e) => update({ password: e.target.value })}
                     />
-                    <Eye className="absolute right-4 top-3 text-gray-400" />
+                    <Eye className="absolute right-4 top-3 text-gray-400 w-4 h-4" />
                   </div>
+
                   <div className="flex gap-3">
-                    <button onClick={prev} className="btn-secondary">
+                    <button onClick={prev} className="btn-secondary w-full">
                       Back
                     </button>
-                    <button onClick={next} className="btn-primary">
+                    <button onClick={next} className="btn-primary w-full">
                       Next
                     </button>
                   </div>
                 </div>
               )}
 
+              {/* STEP 3 */}
               {step === 3 && (
-                <div className="space-y-6">
-                  <h1 className="text-2xl font-semibold text-gray-800">
-                    Workspace
-                  </h1>
+                <div className="space-y-5">
+                  <h1 className="text-2xl font-semibold">Workspace</h1>
+
                   <div className="flex">
                     <input
                       value={form.siteName}
                       onChange={(e) => update({ siteName: e.target.value })}
-                      className="flex-1 input rounded-r-none"
+                      className="input rounded-r-none"
                     />
-                    <div className="bg-gray-100 px-4 flex items-center rounded-r-xl text-sm text-gray-500 border border-l-0">
-                      .orbit.app <Check className="ml-2 text-green-500" />
+                    <div className="px-3 flex items-center bg-gray-100 border border-l-0 rounded-r-lg text-sm text-gray-500">
+                      .orbit.app{" "}
+                      <Check className="ml-1 w-4 h-4 text-green-500" />
                     </div>
                   </div>
+
                   <button onClick={next} className="btn-primary w-full">
                     Continue
                   </button>
                 </div>
               )}
 
+              {/* STEP 4 */}
               {step === 4 && (
-                <div className="space-y-6">
-                  <h1 className="text-2xl font-semibold text-gray-800">
-                    Your work
-                  </h1>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <div className="space-y-5">
+                  <h1 className="text-2xl font-semibold">Your work</h1>
+
+                  <div className="grid grid-cols-2 gap-3">
                     {WORK_OPTIONS.map((w) => (
                       <button
                         key={w.label}
@@ -238,49 +242,40 @@ export default function OrbitRegister() {
                           update({ workType: w.label });
                           next();
                         }}
-                        className={`flex flex-col items-center gap-2 p-4 rounded-lg border transition-all
-                        ${
-                          form.workType === w.label
-                            ? "border-blue-500 bg-blue-50 shadow-sm"
-                            : "border-gray-200 hover:border-gray-300 hover:shadow-sm"
-                        }`}
+                        className="border rounded-xl p-4 hover:shadow-sm hover:border-blue-400 transition"
                       >
-                        <span className="text-2xl">{w.icon}</span>
-                        <span className="text-xs font-medium text-gray-700 text-center">
+                        <div className="text-2xl">{w.icon}</div>
+                        <div className="text-xs mt-1 text-gray-700">
                           {w.label}
-                        </span>
+                        </div>
                       </button>
                     ))}
                   </div>
                 </div>
               )}
 
+              {/* STEP 5 */}
               {step === 5 && (
-                <div className="space-y-6">
-                  <h1 className="text-2xl font-semibold text-gray-800">
-                    Team goals
-                  </h1>
+                <div className="space-y-5">
+                  <h1 className="text-2xl font-semibold">Team goals</h1>
+
                   <div className="grid grid-cols-2 gap-3">
                     {TEAM_OPTIONS.map((g) => (
                       <label
                         key={g}
-                        className={`flex gap-2 p-3 border rounded-lg cursor-pointer transition
-                        ${
-                          form.teamGoals.includes(g)
-                            ? "border-blue-500 bg-blue-50"
-                            : "border-gray-200 hover:border-gray-300"
-                        }`}
+                        className="flex items-center gap-2 border p-3 rounded-lg cursor-pointer"
                       >
                         <input type="checkbox" onChange={() => toggleGoal(g)} />
-                        <span className="text-sm text-gray-700">{g}</span>
+                        <span className="text-sm">{g}</span>
                       </label>
                     ))}
                   </div>
+
                   <div className="flex gap-3">
-                    <button onClick={prev} className="btn-secondary">
+                    <button onClick={prev} className="btn-secondary w-full">
                       Back
                     </button>
-                    <button onClick={submit} className="btn-primary">
+                    <button onClick={submit} className="btn-primary w-full">
                       Finish
                     </button>
                   </div>
@@ -291,34 +286,33 @@ export default function OrbitRegister() {
         </div>
       </div>
 
+      {/* STYLES */}
       <style jsx>{`
         .input {
           width: 100%;
-          background: white;
           border: 1px solid #e5e7eb;
-          padding: 12px 16px;
+          padding: 12px 14px;
           border-radius: 10px;
           outline: none;
-          font-size: 14px;
+          background: white;
         }
         .input:focus {
           border-color: #2563eb;
-          box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+          box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
         }
         .btn-primary {
           background: #2563eb;
           color: white;
-          padding: 10px 16px;
+          padding: 10px 14px;
           border-radius: 10px;
-          font-weight: 500;
         }
         .btn-primary:hover {
-          background: #1d4ed8;
+          background: #1e40af;
         }
         .btn-secondary {
           background: #f3f4f6;
-          padding: 10px 16px;
           border-radius: 10px;
+          padding: 10px 14px;
         }
       `}</style>
     </div>
