@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Eye, Check, Search, Bell } from "lucide-react";
+import { useRouter } from "next/navigation";
 import axios from "axios";
 
 const WORK_OPTIONS = [
@@ -31,6 +32,7 @@ const TEAM_OPTIONS = [
 ];
 
 const steps = ["Email", "Account", "Workspace", "Work", "Team"];
+const router = useRouter();
 
 type FormType = {
   fullName: string;
@@ -68,10 +70,19 @@ export default function OrbitRegister() {
   };
 
   const submit = async () => {
-    await axios.post("/api/users", {
-      ...form,
-      work: form.workType ? [form.workType] : [],
-    });
+    try {
+      const res = await axios.post("/api/users", {
+        ...form,
+        work: form.workType ? [form.workType] : [],
+      });
+
+      if (res.status === 201 || res.status === 200) {
+        router.push("/profile");
+      }
+    } catch (error: any) {
+      console.error("Registration failed:", error.response?.data);
+      alert("Something went wrong. Try again.");
+    }
   };
 
   const variants = {
@@ -82,7 +93,6 @@ export default function OrbitRegister() {
 
   return (
     <div className="relative min-h-screen bg-[#f4f5f7] overflow-hidden">
-
       {/* JIRA STYLE BACKGROUND */}
       <div className="absolute inset-0 opacity-40 pointer-events-none">
         <div className="h-12 bg-white border-b flex items-center justify-between px-4">
@@ -121,7 +131,6 @@ export default function OrbitRegister() {
       {/* FORM */}
       <div className="relative z-10 flex items-center justify-center min-h-screen px-4 backdrop-blur-sm">
         <div className="w-full max-w-2xl bg-white rounded-2xl shadow-md p-8 border border-gray-200">
-
           {/* Progress */}
           <div className="flex items-center justify-between mb-6">
             {steps.map((_, i) => (
@@ -132,7 +141,7 @@ export default function OrbitRegister() {
                   {i + 1}
                 </div>
                 {i < steps.length - 1 && (
-                  <div className="flex-1 h-[2px] bg-gray-200" />
+                  <div className="flex-1 h-0.5 bg-gray-200" />
                 )}
               </div>
             ))}
@@ -149,46 +158,78 @@ export default function OrbitRegister() {
               exit="exit"
               transition={{ duration: 0.25 }}
             >
-
               {step === 1 && (
                 <div className="space-y-6">
-                  <h1 className="text-2xl font-semibold text-gray-800">Start your journey</h1>
-                  <input className="input" placeholder="Email" onChange={(e)=>update({email:e.target.value})} />
-                  <button onClick={next} className="btn-primary w-full">Continue</button>
+                  <h1 className="text-2xl font-semibold text-gray-800">
+                    Start your journey
+                  </h1>
+                  <input
+                    className="input"
+                    placeholder="Email"
+                    onChange={(e) => update({ email: e.target.value })}
+                  />
+                  <button onClick={next} className="btn-primary w-full">
+                    Continue
+                  </button>
                 </div>
               )}
 
               {step === 2 && (
                 <div className="space-y-6">
-                  <h1 className="text-2xl font-semibold text-gray-800">Create account</h1>
-                  <input className="input" placeholder="Full name" onChange={(e)=>update({fullName:e.target.value})} />
+                  <h1 className="text-2xl font-semibold text-gray-800">
+                    Create account
+                  </h1>
+                  <input
+                    className="input"
+                    placeholder="Full name"
+                    onChange={(e) => update({ fullName: e.target.value })}
+                  />
                   <div className="relative">
-                    <input type="password" className="input" placeholder="Password" onChange={(e)=>update({password:e.target.value})} />
+                    <input
+                      type="password"
+                      className="input"
+                      placeholder="Password"
+                      onChange={(e) => update({ password: e.target.value })}
+                    />
                     <Eye className="absolute right-4 top-3 text-gray-400" />
                   </div>
                   <div className="flex gap-3">
-                    <button onClick={prev} className="btn-secondary">Back</button>
-                    <button onClick={next} className="btn-primary">Next</button>
+                    <button onClick={prev} className="btn-secondary">
+                      Back
+                    </button>
+                    <button onClick={next} className="btn-primary">
+                      Next
+                    </button>
                   </div>
                 </div>
               )}
 
               {step === 3 && (
                 <div className="space-y-6">
-                  <h1 className="text-2xl font-semibold text-gray-800">Workspace</h1>
+                  <h1 className="text-2xl font-semibold text-gray-800">
+                    Workspace
+                  </h1>
                   <div className="flex">
-                    <input value={form.siteName} onChange={(e)=>update({siteName:e.target.value})} className="flex-1 input rounded-r-none" />
+                    <input
+                      value={form.siteName}
+                      onChange={(e) => update({ siteName: e.target.value })}
+                      className="flex-1 input rounded-r-none"
+                    />
                     <div className="bg-gray-100 px-4 flex items-center rounded-r-xl text-sm text-gray-500 border border-l-0">
                       .orbit.app <Check className="ml-2 text-green-500" />
                     </div>
                   </div>
-                  <button onClick={next} className="btn-primary w-full">Continue</button>
+                  <button onClick={next} className="btn-primary w-full">
+                    Continue
+                  </button>
                 </div>
               )}
 
               {step === 4 && (
                 <div className="space-y-6">
-                  <h1 className="text-2xl font-semibold text-gray-800">Your work</h1>
+                  <h1 className="text-2xl font-semibold text-gray-800">
+                    Your work
+                  </h1>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {WORK_OPTIONS.map((w) => (
                       <button
@@ -198,9 +239,11 @@ export default function OrbitRegister() {
                           next();
                         }}
                         className={`flex flex-col items-center gap-2 p-4 rounded-lg border transition-all
-                        ${form.workType === w.label
-                          ? "border-blue-500 bg-blue-50 shadow-sm"
-                          : "border-gray-200 hover:border-gray-300 hover:shadow-sm"}`}
+                        ${
+                          form.workType === w.label
+                            ? "border-blue-500 bg-blue-50 shadow-sm"
+                            : "border-gray-200 hover:border-gray-300 hover:shadow-sm"
+                        }`}
                       >
                         <span className="text-2xl">{w.icon}</span>
                         <span className="text-xs font-medium text-gray-700 text-center">
@@ -214,28 +257,35 @@ export default function OrbitRegister() {
 
               {step === 5 && (
                 <div className="space-y-6">
-                  <h1 className="text-2xl font-semibold text-gray-800">Team goals</h1>
+                  <h1 className="text-2xl font-semibold text-gray-800">
+                    Team goals
+                  </h1>
                   <div className="grid grid-cols-2 gap-3">
                     {TEAM_OPTIONS.map((g) => (
                       <label
                         key={g}
                         className={`flex gap-2 p-3 border rounded-lg cursor-pointer transition
-                        ${form.teamGoals.includes(g)
-                          ? "border-blue-500 bg-blue-50"
-                          : "border-gray-200 hover:border-gray-300"}`}
+                        ${
+                          form.teamGoals.includes(g)
+                            ? "border-blue-500 bg-blue-50"
+                            : "border-gray-200 hover:border-gray-300"
+                        }`}
                       >
-                        <input type="checkbox" onChange={()=>toggleGoal(g)} />
+                        <input type="checkbox" onChange={() => toggleGoal(g)} />
                         <span className="text-sm text-gray-700">{g}</span>
                       </label>
                     ))}
                   </div>
                   <div className="flex gap-3">
-                    <button onClick={prev} className="btn-secondary">Back</button>
-                    <button onClick={submit} className="btn-primary">Finish</button>
+                    <button onClick={prev} className="btn-secondary">
+                      Back
+                    </button>
+                    <button onClick={submit} className="btn-primary">
+                      Finish
+                    </button>
                   </div>
                 </div>
               )}
-
             </motion.div>
           </AnimatePresence>
         </div>
@@ -253,7 +303,7 @@ export default function OrbitRegister() {
         }
         .input:focus {
           border-color: #2563eb;
-          box-shadow: 0 0 0 2px rgba(37,99,235,0.1);
+          box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
         }
         .btn-primary {
           background: #2563eb;
