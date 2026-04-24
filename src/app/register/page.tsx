@@ -5,6 +5,31 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Eye, Check, Search, Bell } from "lucide-react";
 import axios from "axios";
 
+const WORK_OPTIONS = [
+  { label: "software development", icon: "💻" },
+  { label: "marketing", icon: "📢" },
+  { label: "project management", icon: "📅" },
+  { label: "it support", icon: "🎧" },
+  { label: "customer service", icon: "🌍" },
+  { label: "finance", icon: "📊" },
+  { label: "data science", icon: "📉" },
+  { label: "design", icon: "🎨" },
+  { label: "operations", icon: "⚙️" },
+  { label: "human resources", icon: "👔" },
+  { label: "legal", icon: "🏛️" },
+  { label: "sales", icon: "💼" },
+  { label: "other", icon: "✨" },
+];
+
+const TEAM_OPTIONS = [
+  "track work",
+  "manage tasks",
+  "works in scrum",
+  "run sprints",
+  "prioritize work",
+  "map work dependencies",
+];
+
 const steps = ["Email", "Account", "Workspace", "Work", "Team"];
 
 type FormType = {
@@ -50,18 +75,16 @@ export default function OrbitRegister() {
   };
 
   const variants = {
-    initial: { opacity: 0, y: 20 },
-    animate: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: -10 },
+    initial: { opacity: 0, y: 20, scale: 0.98 },
+    animate: { opacity: 1, y: 0, scale: 1 },
+    exit: { opacity: 0, y: -10, scale: 0.98 },
   };
 
   return (
     <div className="relative min-h-screen bg-[#f4f5f7] overflow-hidden">
 
-      {/* FULL JIRA STYLE SKELETON BACKGROUND */}
+      {/* JIRA STYLE BACKGROUND */}
       <div className="absolute inset-0 opacity-40 pointer-events-none">
-
-        {/* Top Bar */}
         <div className="h-12 bg-white border-b flex items-center justify-between px-4">
           <div className="flex items-center gap-4">
             <div className="w-6 h-6 bg-blue-600 rounded-sm" />
@@ -76,8 +99,6 @@ export default function OrbitRegister() {
         </div>
 
         <div className="flex h-[calc(100vh-48px)]">
-
-          {/* Sidebar */}
           <div className="w-64 bg-white border-r p-4 space-y-4">
             <div className="h-8 bg-gray-200 rounded" />
             {[...Array(8)].map((_, i) => (
@@ -85,7 +106,6 @@ export default function OrbitRegister() {
             ))}
           </div>
 
-          {/* Board */}
           <div className="flex-1 p-6 grid grid-cols-4 gap-6">
             {[...Array(4)].map((_, i) => (
               <div key={i} className="space-y-4">
@@ -98,9 +118,9 @@ export default function OrbitRegister() {
         </div>
       </div>
 
-      {/* FORM MODAL */}
-      <div className="relative z-10 flex items-center justify-center min-h-screen px-4">
-        <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg p-8 border">
+      {/* FORM */}
+      <div className="relative z-10 flex items-center justify-center min-h-screen px-4 backdrop-blur-sm">
+        <div className="w-full max-w-2xl bg-white rounded-2xl shadow-md p-8 border border-gray-200">
 
           {/* Progress */}
           <div className="flex items-center justify-between mb-6">
@@ -132,7 +152,7 @@ export default function OrbitRegister() {
 
               {step === 1 && (
                 <div className="space-y-6">
-                  <h1 className="text-2xl font-semibold">Start your journey</h1>
+                  <h1 className="text-2xl font-semibold text-gray-800">Start your journey</h1>
                   <input className="input" placeholder="Email" onChange={(e)=>update({email:e.target.value})} />
                   <button onClick={next} className="btn-primary w-full">Continue</button>
                 </div>
@@ -140,7 +160,7 @@ export default function OrbitRegister() {
 
               {step === 2 && (
                 <div className="space-y-6">
-                  <h1 className="text-2xl font-semibold">Create account</h1>
+                  <h1 className="text-2xl font-semibold text-gray-800">Create account</h1>
                   <input className="input" placeholder="Full name" onChange={(e)=>update({fullName:e.target.value})} />
                   <div className="relative">
                     <input type="password" className="input" placeholder="Password" onChange={(e)=>update({password:e.target.value})} />
@@ -155,7 +175,7 @@ export default function OrbitRegister() {
 
               {step === 3 && (
                 <div className="space-y-6">
-                  <h1 className="text-2xl font-semibold">Workspace</h1>
+                  <h1 className="text-2xl font-semibold text-gray-800">Workspace</h1>
                   <div className="flex">
                     <input value={form.siteName} onChange={(e)=>update({siteName:e.target.value})} className="flex-1 input rounded-r-none" />
                     <div className="bg-gray-100 px-4 flex items-center rounded-r-xl text-sm text-gray-500 border border-l-0">
@@ -168,11 +188,24 @@ export default function OrbitRegister() {
 
               {step === 4 && (
                 <div className="space-y-6">
-                  <h1 className="text-2xl font-semibold">Your work</h1>
-                  <div className="grid grid-cols-2 gap-3">
-                    {WORK_OPTIONS.map(w=> (
-                      <button key={w} onClick={()=>{update({workType:w});next();}} className="p-4 border rounded-xl hover:bg-gray-50">
-                        {w}
+                  <h1 className="text-2xl font-semibold text-gray-800">Your work</h1>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {WORK_OPTIONS.map((w) => (
+                      <button
+                        key={w.label}
+                        onClick={() => {
+                          update({ workType: w.label });
+                          next();
+                        }}
+                        className={`flex flex-col items-center gap-2 p-4 rounded-lg border transition-all
+                        ${form.workType === w.label
+                          ? "border-blue-500 bg-blue-50 shadow-sm"
+                          : "border-gray-200 hover:border-gray-300 hover:shadow-sm"}`}
+                      >
+                        <span className="text-2xl">{w.icon}</span>
+                        <span className="text-xs font-medium text-gray-700 text-center">
+                          {w.label}
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -181,12 +214,18 @@ export default function OrbitRegister() {
 
               {step === 5 && (
                 <div className="space-y-6">
-                  <h1 className="text-2xl font-semibold">Team goals</h1>
+                  <h1 className="text-2xl font-semibold text-gray-800">Team goals</h1>
                   <div className="grid grid-cols-2 gap-3">
-                    {["tasks","scrum","planning","tracking"].map(g=> (
-                      <label key={g} className="flex gap-2 p-3 border rounded-xl cursor-pointer hover:bg-gray-50">
+                    {TEAM_OPTIONS.map((g) => (
+                      <label
+                        key={g}
+                        className={`flex gap-2 p-3 border rounded-lg cursor-pointer transition
+                        ${form.teamGoals.includes(g)
+                          ? "border-blue-500 bg-blue-50"
+                          : "border-gray-200 hover:border-gray-300"}`}
+                      >
                         <input type="checkbox" onChange={()=>toggleGoal(g)} />
-                        {g}
+                        <span className="text-sm text-gray-700">{g}</span>
                       </label>
                     ))}
                   </div>
@@ -208,8 +247,9 @@ export default function OrbitRegister() {
           background: white;
           border: 1px solid #e5e7eb;
           padding: 12px 16px;
-          border-radius: 12px;
+          border-radius: 10px;
           outline: none;
+          font-size: 14px;
         }
         .input:focus {
           border-color: #2563eb;
@@ -219,12 +259,16 @@ export default function OrbitRegister() {
           background: #2563eb;
           color: white;
           padding: 10px 16px;
-          border-radius: 12px;
+          border-radius: 10px;
+          font-weight: 500;
+        }
+        .btn-primary:hover {
+          background: #1d4ed8;
         }
         .btn-secondary {
           background: #f3f4f6;
           padding: 10px 16px;
-          border-radius: 12px;
+          border-radius: 10px;
         }
       `}</style>
     </div>
