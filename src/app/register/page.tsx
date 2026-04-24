@@ -32,7 +32,6 @@ const TEAM_OPTIONS = [
 ];
 
 const steps = ["Email", "Account", "Workspace", "Work", "Team"];
-const router = useRouter();
 
 type FormType = {
   fullName: string;
@@ -53,7 +52,8 @@ export default function OrbitRegister() {
     workType: "",
     teamGoals: [],
   });
-
+  
+  const router = useRouter();
   const next = () => setStep((s) => Math.min(s + 1, 5));
   const prev = () => setStep((s) => Math.max(s - 1, 1));
 
