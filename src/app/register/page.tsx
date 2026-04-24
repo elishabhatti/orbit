@@ -71,7 +71,7 @@ export default function OrbitRegister() {
 
   const submit = async () => {
     try {
-      const res = await axios.post("/api/users", {
+      const res = await axios.post("/api/register", {
         ...form,
         work: form.workType ? [form.workType] : [],
       });
