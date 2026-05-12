@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-
 import { connectDB } from "@/src/lib/db";
 import { getAuthUser } from "@/src/lib/auth";
-import { workspaceModel } from "@/src/models/workspace.model";
+import { WorkspaceService } from "@/src/services/workspace.services";
 
 export async function GET() {
   try {
@@ -17,12 +16,8 @@ export async function GET() {
       );
     }
 
-    const workspaces = await workspaceModel
-      .find({
-        "members.user": user._id,
-      })
-      .populate("owner", "fullName email avatar")
-      .sort({ createdAt: -1 });
+    // Service method ka use
+    const workspaces = await WorkspaceService.getMyWorkspaces(user._id);
 
     return NextResponse.json({
       success: true,
@@ -30,10 +25,7 @@ export async function GET() {
     });
   } catch (err: any) {
     return NextResponse.json(
-      {
-        success: false,
-        message: err.message,
-      },
+      { success: false, message: err.message },
       { status: 500 }
     );
   }

@@ -1,23 +1,20 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/src/lib/db";
-import { workspaceModel } from "@/src/models/workspace.model";
+import { WorkspaceService } from "@/src/services/workspace.services";
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     await connectDB();
 
-    const workspace = await workspaceModel
-      .findById(params.id)
-      .populate("owner", "fullName email avatar")
-      .populate("members.user", "fullName email avatar");
+    const workspace = await WorkspaceService.getWorkspaceById(params.id);
 
     if (!workspace) {
       return NextResponse.json(
-        { success: false, message: "Not found" },
-        { status: 404 }
+        { success: false, message: "Workspace not found" },
+        { status: 404 },
       );
     }
 
@@ -27,11 +24,8 @@ export async function GET(
     });
   } catch (err: any) {
     return NextResponse.json(
-      {
-        success: false,
-        message: err.message,
-      },
-      { status: 500 }
+      { success: false, message: err.message },
+      { status: 500 },
     );
   }
 }
