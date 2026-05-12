@@ -1,37 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Eye, Check, Search, Bell } from "lucide-react";
+import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-
-const WORK_OPTIONS = [
-  { label: "software development", icon: "💻" },
-  { label: "marketing", icon: "📢" },
-  { label: "project management", icon: "📅" },
-  { label: "it support", icon: "🎧" },
-  { label: "customer service", icon: "🌍" },
-  { label: "finance", icon: "📊" },
-  { label: "data science", icon: "📉" },
-  { label: "design", icon: "🎨" },
-  { label: "operations", icon: "⚙️" },
-  { label: "human resources", icon: "👔" },
-  { label: "legal", icon: "🏛️" },
-  { label: "sales", icon: "💼" },
-  { label: "other", icon: "✨" },
-];
-
-const TEAM_OPTIONS = [
-  "track work",
-  "manage tasks",
-  "works in scrum",
-  "run sprints",
-  "prioritize work",
-  "map work dependencies",
-];
-
-const steps = ["Email", "Account", "Workspace", "Work", "Team"];
+import { TEAM_OPTIONS, WORK_OPTIONS } from "@/src/lib/constants";
 
 type FormType = {
   fullName: string;
@@ -43,7 +16,6 @@ type FormType = {
 };
 
 export default function OrbitRegister() {
-  const [step, setStep] = useState<number>(1);
   const [form, setForm] = useState<FormType>({
     fullName: "",
     email: "",
@@ -52,10 +24,8 @@ export default function OrbitRegister() {
     workType: "",
     teamGoals: [],
   });
-
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const next = () => setStep((s) => Math.min(s + 1, 5));
-  const prev = () => setStep((s) => Math.max(s - 1, 1));
 
   const update = (data: Partial<FormType>) =>
     setForm((f) => ({ ...f, ...data }));
@@ -70,251 +40,114 @@ export default function OrbitRegister() {
   };
 
   const submit = async () => {
+    setLoading(true);
     try {
       const res = await axios.post("/api/register", {
         ...form,
         work: form.workType ? [form.workType] : [],
       });
-
-      if (res.status === 201 || res.status === 200) {
-        router.push("/profile");
-      }
-    } catch (error: any) {
-      console.error("Registration failed:", error.response?.data);
-      alert("Something went wrong. Try again.");
+      if (res.status === 201 || res.status === 200) router.push("/profile");
+    } catch (error) {
+      alert("Registration failed");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const variants = {
-    initial: { opacity: 0, y: 20, scale: 0.98 },
-    animate: { opacity: 1, y: 0, scale: 1 },
-    exit: { opacity: 0, y: -10, scale: 0.98 },
-  };
-
   return (
-    <div className="relative min-h-screen overflow-hidden">
-      {/* SOFT GRID BACKGROUND (CLEAN JIRA FEEL) */}
-      <div className="absolute inset-0 bg-[radial-gradient(#dfe1e6_1px,transparent_1px)] [background-size:20px_20px] opacity-40" />
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 py-12">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-lg bg-white border border-gray-200 rounded-2xl p-10 shadow-sm"
+      >
+        <header className="mb-10 text-center">
+          <h1 className="text-2xl font-semibold text-gray-900">
+            Create account
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Set up your workspace in one step
+          </p>
+        </header>
 
-      {/* TOP BAR */}
-      <div className="absolute top-0 left-0 right-0 h-12 bg-white border-b flex items-center justify-between px-5 z-0">
-        <div className="flex items-center gap-4">
-          <div className="w-7 h-7 bg-blue-600 rounded-md shadow-sm" />
-          <div className="w-28 h-3 bg-gray-200 rounded" />
-        </div>
-
-        <div className="flex items-center gap-3">
-          <Search size={16} className="text-gray-400" />
-          <Bell size={16} className="text-gray-400" />
-          <div className="w-7 h-7 bg-gray-200 rounded-full" />
-        </div>
-      </div>
-
-      {/* FORM */}
-      <div className="relative z-10 flex items-center justify-center min-h-screen px-4 pt-16">
-        <div className="w-full max-w-2xl bg-white/95 backdrop-blur-md border border-gray-200 shadow-xl rounded-2xl p-8">
-          {/* PROGRESS */}
-          <div className="flex mb-6">
-            {steps.map((_, i) => (
-              <div key={i} className="flex-1 flex items-center">
-                <div
-                  className={`w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium transition ${
-                    step >= i + 1
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-200 text-gray-500"
-                  }`}
-                >
-                  {i + 1}
-                </div>
-                {i !== steps.length - 1 && (
-                  <div className="flex-1 h-[2px] bg-gray-200 mx-2" />
-                )}
-              </div>
-            ))}
+        <div className="space-y-8">
+          {/* SECTION: Account Info */}
+          <div className="space-y-4">
+            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+              Account
+            </h3>
+            <input
+              className="w-full border-b border-gray-200 py-2 outline-none focus:border-black transition text-sm"
+              placeholder="Full Name"
+              onChange={(e) => update({ fullName: e.target.value })}
+            />
+            <input
+              className="w-full border-b border-gray-200 py-2 outline-none focus:border-black transition text-sm"
+              placeholder="Email address"
+              onChange={(e) => update({ email: e.target.value })}
+            />
+            <input
+              type="password"
+              className="w-full border-b border-gray-200 py-2 outline-none focus:border-black transition text-sm"
+              placeholder="Password"
+              onChange={(e) => update({ password: e.target.value })}
+            />
           </div>
 
-          <p className="text-xs text-gray-500 mb-6">
-            Step {step} of {steps.length}
+          {/* SECTION: Workspace */}
+          <div className="space-y-4">
+            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+              Workspace
+            </h3>
+            <div className="flex items-center border-b border-gray-200">
+              <input
+                value={form.siteName}
+                onChange={(e) => update({ siteName: e.target.value })}
+                className="flex-1 py-2 outline-none text-sm"
+                placeholder="Site name"
+              />
+              <span className="text-gray-400 text-sm">.orbit.app</span>
+            </div>
+          </div>
+
+          {/* SECTION: Focus */}
+          <div className="space-y-4">
+            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+              Your Focus
+            </h3>
+            <div className="grid grid-cols-2 gap-2">
+              {WORK_OPTIONS.slice(0, 4).map((w) => (
+                <button
+                  key={w.label}
+                  onClick={() => update({ workType: w.label })}
+                  className={`text-left p-3 border rounded-lg transition text-xs flex items-center gap-2 ${
+                    form.workType === w.label
+                      ? "border-black bg-gray-50"
+                      : "border-gray-100"
+                  }`}
+                >
+                  <span>{w.icon}</span> {w.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <button
+            onClick={submit}
+            disabled={loading}
+            className="w-full bg-black text-white py-3 rounded-xl text-sm font-medium hover:bg-gray-900 transition disabled:opacity-50 mt-4"
+          >
+            {loading ? "Creating..." : "Complete Setup"}
+          </button>
+
+          <p
+            className="text-center text-xs text-gray-400 cursor-pointer hover:text-black transition"
+            onClick={() => router.push("/login")}
+          >
+            Already have an account? Sign in
           </p>
-
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={step}
-              variants={variants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={{ duration: 0.22 }}
-            >
-              {/* STEP 1 */}
-              {step === 1 && (
-                <div className="space-y-5">
-                  <h1 className="text-2xl font-semibold text-gray-900">
-                    Start your journey
-                  </h1>
-
-                  <input
-                    className="input"
-                    placeholder="Email"
-                    onChange={(e) => update({ email: e.target.value })}
-                  />
-
-                  <button onClick={next} className="btn-primary w-full">
-                    Continue
-                  </button>
-
-                  <button
-                    onClick={() => router.push("/login")}
-                    className="text-sm text-blue-600 hover:underline w-full text-center"
-                  >
-                    Already have an account? Login
-                  </button>
-                </div>
-              )}
-
-              {/* STEP 2 */}
-              {step === 2 && (
-                <div className="space-y-5">
-                  <h1 className="text-2xl font-semibold text-gray-900">
-                    Create account
-                  </h1>
-
-                  <input
-                    className="input"
-                    placeholder="Full name"
-                    onChange={(e) => update({ fullName: e.target.value })}
-                  />
-
-                  <div className="relative">
-                    <input
-                      type="password"
-                      className="input"
-                      placeholder="Password"
-                      onChange={(e) => update({ password: e.target.value })}
-                    />
-                    <Eye className="absolute right-4 top-3 text-gray-400 w-4 h-4" />
-                  </div>
-
-                  <div className="flex gap-3">
-                    <button onClick={prev} className="btn-secondary w-full">
-                      Back
-                    </button>
-                    <button onClick={next} className="btn-primary w-full">
-                      Next
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* STEP 3 */}
-              {step === 3 && (
-                <div className="space-y-5">
-                  <h1 className="text-2xl font-semibold">Workspace</h1>
-
-                  <div className="flex">
-                    <input
-                      value={form.siteName}
-                      onChange={(e) => update({ siteName: e.target.value })}
-                      className="input rounded-r-none"
-                    />
-                    <div className="px-3 flex items-center bg-gray-100 border border-l-0 rounded-r-lg text-sm text-gray-500">
-                      .orbit.app{" "}
-                      <Check className="ml-1 w-4 h-4 text-green-500" />
-                    </div>
-                  </div>
-
-                  <button onClick={next} className="btn-primary w-full">
-                    Continue
-                  </button>
-                </div>
-              )}
-
-              {/* STEP 4 */}
-              {step === 4 && (
-                <div className="space-y-5">
-                  <h1 className="text-2xl font-semibold">Your work</h1>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    {WORK_OPTIONS.map((w) => (
-                      <button
-                        key={w.label}
-                        onClick={() => {
-                          update({ workType: w.label });
-                          next();
-                        }}
-                        className="border rounded-xl p-4 hover:shadow-sm hover:border-blue-400 transition"
-                      >
-                        <div className="text-2xl">{w.icon}</div>
-                        <div className="text-xs mt-1 text-gray-700">
-                          {w.label}
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* STEP 5 */}
-              {step === 5 && (
-                <div className="space-y-5">
-                  <h1 className="text-2xl font-semibold">Team goals</h1>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    {TEAM_OPTIONS.map((g) => (
-                      <label
-                        key={g}
-                        className="flex items-center gap-2 border p-3 rounded-lg cursor-pointer"
-                      >
-                        <input type="checkbox" onChange={() => toggleGoal(g)} />
-                        <span className="text-sm">{g}</span>
-                      </label>
-                    ))}
-                  </div>
-
-                  <div className="flex gap-3">
-                    <button onClick={prev} className="btn-secondary w-full">
-                      Back
-                    </button>
-                    <button onClick={submit} className="btn-primary w-full">
-                      Finish
-                    </button>
-                  </div>
-                </div>
-              )}
-            </motion.div>
-          </AnimatePresence>
         </div>
-      </div>
-
-      {/* STYLES */}
-      <style jsx>{`
-        .input {
-          width: 100%;
-          border: 1px solid #e5e7eb;
-          padding: 12px 14px;
-          border-radius: 10px;
-          outline: none;
-          background: white;
-        }
-        .input:focus {
-          border-color: #2563eb;
-          box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
-        }
-        .btn-primary {
-          background: #2563eb;
-          color: white;
-          padding: 10px 14px;
-          border-radius: 10px;
-        }
-        .btn-primary:hover {
-          background: #1e40af;
-        }
-        .btn-secondary {
-          background: #f3f4f6;
-          border-radius: 10px;
-          padding: 10px 14px;
-        }
-      `}</style>
+      </motion.div>
     </div>
   );
 }
