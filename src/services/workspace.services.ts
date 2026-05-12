@@ -20,7 +20,8 @@ export class WorkspaceService {
   static async getMyWorkspaces(userId: string) {
     return workspaceModel
       .find({ "members.user": userId })
-      .populate("owner", "fullName email avatar");
+      .populate("owner", "fullName email avatar")
+      .sort({ created: -1 });
   }
 
   static async getWorkspaceById(id: string) {
