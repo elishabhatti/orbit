@@ -39,9 +39,7 @@ const DashboardPage = () => {
 
   const fetchWorkspaces = async () => {
     try {
-      const res = await axios.get(
-        "/api/workspace/my-workspaces"
-      );
+      const res = await axios.get("/api/workspace/my-workspaces");
 
       setWorkspaces(res.data.workspaces);
     } catch (error) {
@@ -53,18 +51,12 @@ const DashboardPage = () => {
     try {
       if (!name) return;
 
-      const res = await axios.post(
-        "/api/workspace/create",
-        {
-          name,
-          description,
-        }
-      );
+      const res = await axios.post("/api/workspace/create", {
+        name,
+        description,
+      });
 
-      setWorkspaces((prev) => [
-        res.data.workspace,
-        ...prev,
-      ]);
+      setWorkspaces((prev) => [res.data.workspace, ...prev]);
 
       setName("");
       setDescription("");
@@ -101,16 +93,13 @@ const DashboardPage = () => {
   return (
     <div className="min-h-screen bg-[#fafafa] p-8">
       <div className="max-w-5xl mx-auto">
-        
         <div className="flex items-center justify-between mb-10">
           <div>
             <h1 className="text-2xl font-bold">
               Welcome back, {user?.fullName}
             </h1>
 
-            <p className="text-sm text-gray-500">
-              Manage your workspaces
-            </p>
+            <p className="text-sm text-gray-500">Manage your workspaces</p>
           </div>
 
           <button
@@ -121,29 +110,22 @@ const DashboardPage = () => {
           </button>
         </div>
 
-        
         <div className="bg-white border rounded-2xl p-6 mb-8">
-          <h2 className="text-lg font-semibold mb-4">
-            Create Workspace
-          </h2>
+          <h2 className="text-lg font-semibold mb-4">Create Workspace</h2>
 
           <div className="flex flex-col gap-4">
             <input
               type="text"
               placeholder="Workspace name"
               value={name}
-              onChange={(e) =>
-                setName(e.target.value)
-              }
+              onChange={(e) => setName(e.target.value)}
               className="border rounded-lg px-4 py-3"
             />
 
             <textarea
               placeholder="Description"
               value={description}
-              onChange={(e) =>
-                setDescription(e.target.value)
-              }
+              onChange={(e) => setDescription(e.target.value)}
               className="border rounded-lg px-4 py-3"
             />
 
@@ -156,30 +138,20 @@ const DashboardPage = () => {
           </div>
         </div>
 
-        
         <div>
-          <h2 className="text-xl font-semibold mb-4">
-            Your Workspaces
-          </h2>
+          <h2 className="text-xl font-semibold mb-4">Your Workspaces</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {workspaces.map((workspace) => (
               <div
                 key={workspace._id}
-                onClick={() =>
-                  router.push(
-                    `/workspace/${workspace._id}`
-                  )
-                }
+                onClick={() => router.push(`/workspace/${workspace._id}`)}
                 className="bg-white border rounded-2xl p-6 cursor-pointer hover:border-black transition"
               >
-                <h3 className="font-semibold text-lg">
-                  {workspace.name}
-                </h3>
+                <h3 className="font-semibold text-lg">{workspace.name}</h3>
 
                 <p className="text-sm text-gray-500 mt-2">
-                  {workspace.description ||
-                    "No description"}
+                  {workspace.description || "No description"}
                 </p>
               </div>
             ))}

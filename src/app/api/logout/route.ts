@@ -6,11 +6,10 @@ export async function POST() {
       { message: "Logged out successfully" },
       { status: 200 }
     );
-
-    // ❌ delete cookie properly
+    
     response.cookies.set("token", "", {
       httpOnly: true,
-      expires: new Date(0), // kills cookie
+      expires: new Date(0),
       path: "/",
     });
 
