@@ -4,14 +4,16 @@ import { taskModel } from "@/src/models/task.model";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }, // Next.js 15/16 fix
 ) {
   try {
     await connectDB();
-    const tasks = await taskModel.find({ project: params.id }).sort({ createdAt: -1 });
+    const { id } = await params; // Await params here
+
+    const tasks = await taskModel.find({ project: id });
 
     return NextResponse.json({ success: true, tasks });
-  } catch (err: any) {
-    return NextResponse.json({ success: false, message: err.message }, { status: 500 });
+  } catch (error: any) {
+    return NextResponse.json({ message: error.message }, { status: 500 });
   }
 }
