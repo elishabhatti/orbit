@@ -8,12 +8,10 @@ export async function GET(
 ) {
   try {
     await connectDB();
-    const { id } = params;
-
-    const tasks = await taskModel.find({ project: id }).sort({ createdAt: -1 });
+    const tasks = await taskModel.find({ project: params.id }).sort({ createdAt: -1 });
 
     return NextResponse.json({ success: true, tasks });
-  } catch (error: any) {
-    return NextResponse.json({ message: error.message }, { status: 500 });
+  } catch (err: any) {
+    return NextResponse.json({ success: false, message: err.message }, { status: 500 });
   }
 }

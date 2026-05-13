@@ -7,18 +7,14 @@ export async function POST(req: NextRequest) {
   try {
     await connectDB();
     const user = await getAuthUser();
-
     if (!user) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
     const body = await req.json();
-    const { title, projectId, workspaceId, priority } = body;
+    const { title, projectId, workspaceId, priority, description } = body;
 
-    if (!title || !projectId || !workspaceId) {
-      return NextResponse.json({ message: "Missing fields" }, { status: 400 });
-    }
-
-    const task = await taskModel.create({
+    const newTask = await taskModel.create({
       title,
+      description,
       project: projectId,
       workspace: workspaceId,
       priority: priority || "medium",
@@ -26,8 +22,8 @@ export async function POST(req: NextRequest) {
       createdBy: user._id,
     });
 
-    return NextResponse.json({ success: true, task });
-  } catch (error: any) {
-    return NextResponse.json({ message: error.message }, { status: 500 });
+    return NextResponse.json({ success: true, task: newTask });
+  } catch (err: any) {
+    return NextResponse.json({ success: false, message: err.message }, { status: 500 });
   }
 }

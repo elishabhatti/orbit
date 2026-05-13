@@ -28,13 +28,13 @@ const DashboardPage = () => {
     const loadData = async () => {
       try {
         const [userRes, workspaceRes] = await Promise.all([
-          axios.get("/api/me"),
+          axios.get("/api/auth/me"),
           axios.get("/api/workspace/my-workspaces"),
         ]);
         setUser(userRes.data);
         setWorkspaces(workspaceRes.data.workspaces);
       } catch (err) {
-        router.push("/login");
+        router.push("/auth/login");
       } finally {
         setLoading(false);
       }
@@ -78,7 +78,7 @@ const DashboardPage = () => {
           </div>
           <button
             onClick={() =>
-              axios.post("/api/logout").then(() => router.push("/login"))
+              axios.post("/api/auth/logout").then(() => router.push("/login"))
             }
             className="text-[11px] font-bold uppercase tracking-wider border border-gray-200 px-4 py-2 rounded hover:bg-gray-50 transition"
           >

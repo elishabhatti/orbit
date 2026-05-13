@@ -1,31 +1,19 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/src/lib/db";
-import { WorkspaceService } from "@/src/services/workspace.services";
+import { projectModel } from "@/src/models/project.model";
 
 export async function GET(
-  req: Request,
-  { params }: { params: { id: string } },
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
+    const { id } = await params; // Await params here too
 
-    const workspace = await WorkspaceService.getWorkspaceById(params.id);
-
-    if (!workspace) {
-      return NextResponse.json(
-        { success: false, message: "Workspace not found" },
-        { status: 404 },
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      workspace,
-    });
-  } catch (err: any) {
-    return NextResponse.json(
-      { success: false, message: err.message },
-      { status: 500 },
-    );
+    const projects = await projectModel.find({ workspace: id });
+    
+    return NextResponse.json({ success: true, projects });
+  } catch (error: any) {
+    return NextResponse.json({ message: error.message }, { status: 500 });
   }
 }
