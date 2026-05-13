@@ -4,6 +4,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+// Types
 interface Workspace {
   _id: string;
   name: string;
@@ -20,157 +21,148 @@ const DashboardPage = () => {
   const [user, setUser] = useState<User | null>(null);
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(true);
 
-  const fetchUser = async () => {
-    try {
-      const res = await axios.get("/api/me");
-      setUser(res.data);
-    } catch {
-      router.push("/login");
-    }
-  };
-
-  const fetchWorkspaces = async () => {
-    try {
-      const res = await axios.get("/api/workspace/my-workspaces");
-      setWorkspaces(res.data.workspaces);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const createWorkspace = async () => {
-    try {
-      if (!name) return;
-      const res = await axios.post("/api/workspace/create", {
-        name,
-        description,
-      });
-      setWorkspaces((prev) => [res.data.workspace, ...prev]);
-      setName("");
-      setDescription("");
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const logout = async () => {
-    await axios.post("/api/logout");
-    router.push("/login");
-  };
-
+  // Fetch Logic
   useEffect(() => {
     const loadData = async () => {
-      await fetchUser();
-      await fetchWorkspaces();
-      setLoading(false);
+      try {
+        const [userRes, workspaceRes] = await Promise.all([
+          axios.get("/api/me"),
+          axios.get("/api/workspace/my-workspaces"),
+        ]);
+        setUser(userRes.data);
+        setWorkspaces(workspaceRes.data.workspaces);
+      } catch (err) {
+        router.push("/login");
+      } finally {
+        setLoading(false);
+      }
     };
     loadData();
-  }, []);
+  }, [router]);
+
+  const createWorkspace = async () => {
+    if (!name.trim()) return;
+    try {
+      const res = await axios.post("/api/workspace/create", { name });
+      setWorkspaces((prev) => [res.data.workspace, ...prev]);
+      setName("");
+    } catch (error) {
+      console.log("Create Error:", error);
+    }
+  };
 
   if (loading)
     return (
-      <div className="h-screen flex items-center justify-center text-sm text-gray-500 font-medium">
+      <div className="h-screen flex items-center justify-center text-xs uppercase tracking-widest text-gray-400">
         Loading...
       </div>
     );
 
   return (
-    <div className="min-h-screen p-6 md:p-12 text-[#111]">
+    <div className="min-h-screen bg-[#fafafa] text-[#111] p-6 md:p-12 font-sans">
       <div className="max-w-2xl mx-auto">
-        {/* Header Section */}
-        <div className="flex items-center justify-between mb-12">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-black rounded-full flex items-center justify-center text-white text-sm font-bold">
+        {/* 1. USER INFO SECTION */}
+        <header className="flex justify-between items-center mb-16">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center text-white font-bold text-lg">
               {user?.fullName?.[0]}
             </div>
             <div>
-              <h1 className="text-base font-semibold leading-none">
+              <h1 className="text-sm font-bold uppercase tracking-tight">
                 {user?.fullName}
               </h1>
-              <p className="text-xs text-gray-500 mt-1">{user?.email}</p>
+              <p className="text-xs text-gray-500">{user?.email}</p>
             </div>
           </div>
-
           <button
-            onClick={logout}
-            className="text-xs font-medium border border-gray-200 px-3 py-1.5 rounded-md hover:bg-gray-50 transition"
+            onClick={() =>
+              axios.post("/api/logout").then(() => router.push("/login"))
+            }
+            className="text-[11px] font-bold uppercase tracking-wider border border-gray-200 px-4 py-2 rounded hover:bg-gray-50 transition"
           >
-            Sign out
+            Logout
           </button>
-        </div>
+        </header>
 
-        {/* Create Workspace Section */}
-        <div className="bg-white border border-gray-200 rounded-xl p-6 mb-10">
-          <h2 className="text-xs text-gray-400 uppercase tracking-widest font-bold mb-4">
-            New Workspace
-          </h2>
-
-          <div className="flex flex-col gap-3">
+        {/* 2. CREATE WORKSPACE BUTTON / INPUT */}
+        <section className="mb-12">
+          <div className="bg-white border border-gray-200 rounded-xl p-1 flex gap-2">
             <input
               type="text"
-              placeholder="Workspace name"
+              placeholder="Workspace name..."
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="text-sm border border-gray-200 rounded-lg px-4 py-2.5 focus:outline-none focus:border-black transition"
+              className="flex-1 px-4 py-2 text-sm focus:outline-none bg-transparent"
             />
-
-            <textarea
-              placeholder="Description (optional)"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="text-sm border border-gray-200 rounded-lg px-4 py-2.5 focus:outline-none focus:border-black transition min-h-[80px] resize-none"
-            />
-
             <button
               onClick={createWorkspace}
-              className="bg-black text-white text-xs font-bold py-3 rounded-lg hover:bg-zinc-800 transition uppercase tracking-tighter"
+              className="bg-black text-white text-[11px] font-bold uppercase tracking-widest px-6 py-2 rounded-lg hover:bg-zinc-800 transition"
             >
-              Create Workspace
+              Create
             </button>
           </div>
-        </div>
+        </section>
 
-        {/* Workspaces List */}
-        <div>
-          <h2 className="text-xs text-gray-400 uppercase tracking-widest font-bold mb-4">
-            Your Workspaces
-          </h2>
+        {/* 3. WORKSPACE LIST */}
+        <section>
+          <div className="flex items-center justify-between mb-6 border-b border-gray-100 pb-2">
+            <h2 className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">
+              Your Workspaces
+            </h2>
+            <span className="text-[10px] font-mono text-gray-300">
+              {workspaces.length} Total
+            </span>
+          </div>
 
           <div className="grid gap-3">
-            {workspaces.length > 0 ? (
-              workspaces.map((workspace) => (
-                <div
-                  key={workspace._id}
-                  onClick={() => router.push(`/workspace/${workspace._id}`)}
-                  className="group bg-white border border-gray-200 rounded-xl p-5 cursor-pointer hover:border-black transition"
-                >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-semibold text-sm group-hover:underline underline-offset-2">
-                        {workspace.name}
-                      </h3>
-                      <p className="text-xs text-gray-500 mt-1 line-clamp-1">
-                        {workspace.description || "Personal workspace"}
-                      </p>
-                    </div>
-                    <div className="text-[10px] text-gray-400 font-mono">
-                      {workspace._id.slice(-4).toUpperCase()}
-                    </div>
-                  </div>
+            {workspaces.map((ws) => (
+              <div
+                key={ws._id}
+                className="group flex items-center justify-between bg-white border border-gray-200 p-5 rounded-xl hover:border-black transition-all cursor-default"
+              >
+                {/* Workspace Name */}
+                <div className="flex flex-col">
+                  <span className="text-sm font-bold text-gray-900">
+                    {ws.name}
+                  </span>
+                  <span className="text-[11px] text-gray-400 mt-0.5 font-mono">
+                    ID: {ws._id.slice(-6)}
+                  </span>
                 </div>
-              ))
-            ) : (
-              <div className="text-center py-10 border border-dashed border-gray-200 rounded-xl">
-                <p className="text-xs text-gray-400 uppercase">
+
+                {/* Open Workspace Button */}
+                <button
+                  onClick={() => router.push(`/workspace/${ws._id}`)}
+                  className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-tighter bg-gray-50 px-4 py-2 rounded-md group-hover:bg-black group-hover:text-white transition-colors"
+                >
+                  Open
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            ))}
+
+            {workspaces.length === 0 && (
+              <div className="text-center py-20 border border-dashed border-gray-200 rounded-2xl">
+                <p className="text-xs text-gray-400 uppercase tracking-widest">
                   No workspaces found
                 </p>
               </div>
             )}
           </div>
-        </div>
+        </section>
       </div>
     </div>
   );
