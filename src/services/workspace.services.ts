@@ -21,7 +21,7 @@ export class WorkspaceService {
     return workspaceModel
       .find({ "members.user": userId })
       .populate("owner", "fullName email avatar")
-      .sort({ created: -1 });
+      .sort({ createdAt: -1 });
   }
 
   static async getWorkspaceById(id: string) {
