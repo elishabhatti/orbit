@@ -46,7 +46,7 @@ export default function OrbitRegister() {
         ...form,
         work: form.workType ? [form.workType] : [],
       });
-      if (res.status === 201 || res.status === 200) router.push("/profile");
+      if (res.status === 201 || res.status === 200) router.push("/dashboard");
     } catch (error) {
       alert("Registration failed");
     } finally {

@@ -18,7 +18,7 @@ export default function LoginPage() {
     try {
       setLoading(true);
       const res = await axios.post("/api/login", form);
-      if (res.status === 200) router.push("/profile");
+      if (res.status === 200) router.push("/dashboard");
     } catch (err) {
       alert("Invalid credentials");
     } finally {
