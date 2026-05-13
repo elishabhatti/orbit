@@ -134,7 +134,7 @@ const DashboardPage = () => {
 
                 {/* Open Workspace Button */}
                 <button
-                  onClick={() => router.push(`dashboard/workspace/${ws._id}`)}
+                  onClick={() => router.push(`/workspace/${ws._id}`)}
                   className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-tighter bg-gray-50 px-4 py-2 rounded-md group-hover:bg-black group-hover:text-white transition-colors"
                 >
                   Open
