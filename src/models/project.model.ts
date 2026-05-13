@@ -29,12 +29,16 @@ const projectSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
     },
+    status: {
+      type: String,
+      enum: ["active", "archived"],
+      default: "active",
+    },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 export const projectModel =
-  mongoose.models.project ||
-  mongoose.model("project", projectSchema);
+  mongoose.models.project || mongoose.model("project", projectSchema);
